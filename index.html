@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8"> 
+    <script src="/socket.io/socket.io.js"></script>
+    <style type="text/css" media="screen">
+      html {
+        height: 100%;
+      }
+      body {
+        overflow: hidden;
+        margin: 0;
+        display: grid;
+        background-color: black;
+        color: white;
+        font-family: monospace;
+        grid-template-rows: 200px auto;
+        grid-template-columns: 60% auto;
+        height: 100%;
+        width: 100%;
+      }
+      
+      h2 {
+        text-align: center;
+      }
+
+      #string {
+        grid-column-start: 1;
+        grid-column-end: 3;
+        grid-row-start: 1;
+        grid-row-end: 2;
+        font-size: 100px;
+        letter-spacing: 20px;
+        border-bottom: 1px solid white;
+        line-height: 200px;
+      }
+
+      #log {
+        grid-column-start: 1;
+        grid-column-end: 2;
+        grid-row-start: 2;
+        grid-row-end: 3;
+        border-right: 1px solid white;
+      }
+
+      #leaderboard {
+        grid-column-start: 2;
+        grid-column-end: 3;
+        grid-row-start: 2;
+        grid-row-end: 3;
+      }
+
+      #leaderboard > table {
+        width: 100%;
+      }
+
+      td { text-align: center; }
+
+      .user {
+        color: red;
+      }
+
+      .msg {
+        color: lime;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="string">&gt;_</div>
+    <div id="log">
+      <h2>Log</h2> 
+    </div>
+    <div id="leaderboard">
+      <h2>Leaderboard</h2> 
+      <table>
+        <colgroup>
+          <col span="1" style="width: 50%">
+          <col span="1" style="width: 50%">
+        </colgroup>
+        <thead><tr><th>Hello World's</th><th>User</th></tr></thead>
+        <tbody id="lb-body"></tbody>
+      </table>
+    </div>
+    <script charset="utf-8">
+      const socket = io()
+      const str = document.getElementById('string')
+      const log = document.getElementById('log')
+      const leaderboard = document.getElementById('lb-body')
+      let cur = ""
+
+      function makeLogLine (status, msg, user) {
+      console.log(status, msg, user)
+        let line = document.createElement('li')
+        if (status == 'ok') {
+          line.innerHTML = `<span class='user'>${user}</span> contributed '<span class='msg'>${msg}</span>' to the current string.`
+        } else if (status == 'failure') {
+          line.innerHTML = `<span class='user'>${user}</span> submitted '<span class='msg'>${msg}</span>' and broke the chain. Resetting...`
+        } else if (status == 'success') {
+          line.innerHTML = `<span class='msg'>Hello, world!</span>`
+        }
+        return line
+      }
+      
+      socket.on('data', ({ status, user, msg }) => {
+        cur = (status == 'ok') ? (cur + msg) : ""
+        str.innerText = '>' + cur + '_'
+        log.appendChild(makeLogLine(status, msg, user)) 
+      })
+      socket.on('leaderboard', data => {
+        console.log(data)
+        leaderboard.innerHTML = '' 
+        data.leaderboard.forEach( user => {
+          leaderboard.innerHTML += `<tr><td>${user.count}</td><td>${user.user}</td></tr>`
+        } )
+      })
+    </script>
+  </body>
+</html>
