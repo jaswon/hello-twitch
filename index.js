@@ -14,9 +14,9 @@ const tw = new Socket()
 
 tw.connect(port, host, () => {
   console.log('connected')
-  tw.write(`PASS ${conf.cred.pass}\n`)
-  tw.write(`NICK ${conf.cred.nick}\n`)
-  tw.write(`JOIN #${conf.cred.nick}\n`)
+  tw.write(`PASS ${conf.cred.pass}\r\n`)
+  tw.write(`NICK ${conf.cred.nick}\r\n`)
+  tw.write(`JOIN #${conf.cred.nick}\r\n`)
 })
 
 const meme = "Hello, world!"
@@ -24,12 +24,16 @@ const meme = "Hello, world!"
 let curAttempt = ""
 const curUsers = new Set()
 
+setInterval(() => {
+  tw.write('PING :tmi.twitch.tv\r\n')
+}, 1000 * 30)
+
 tw.on('data', data => {
   data = data.toString()
   console.log(data)
   if (data.indexOf('PING') != -1) {
     console.log('ponged')
-    return tw.write('PONG :tmi.twitch.tv\n')
+    return tw.write('PONG :tmi.twitch.tv\r\n')
   }
   let tokens = data.match(/^:(.*)!.* PRIVMSG .* :'(.)'\r\n$/)
   if (!tokens) return
