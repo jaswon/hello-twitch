@@ -14,10 +14,15 @@
         background-color: black;
         color: white;
         font-family: monospace;
+        font-size: 20px;
         grid-template-rows: 200px auto;
         grid-template-columns: 60% auto;
         height: 100%;
         width: 100%;
+      }
+
+      body > div {
+        padding: 20px;
       }
       
       h2 {
@@ -32,7 +37,7 @@
         font-size: 100px;
         letter-spacing: 20px;
         border-bottom: 1px solid white;
-        line-height: 200px;
+        line-height: 160px;
       }
 
       #log {
@@ -41,6 +46,11 @@
         grid-row-start: 2;
         grid-row-end: 3;
         border-right: 1px solid white;
+        overflow-y: scroll;
+      }
+
+      #log li {
+        list-style-type: none;
       }
 
       #leaderboard {
@@ -66,7 +76,7 @@
     </style>
   </head>
   <body>
-    <div id="string">&gt;_</div>
+    <div id="string"> &gt;_</div>
     <div id="log">
       <h2>Log</h2> 
     </div>
@@ -103,8 +113,9 @@
       
       socket.on('data', ({ status, user, msg }) => {
         cur = (status == 'ok') ? (cur + msg) : ""
-        str.innerText = '>' + cur + '_'
+        str.innerText = ' >' + cur + '_'
         log.appendChild(makeLogLine(status, msg, user)) 
+        log.scrollTop = log.scrollHeight
       })
       socket.on('leaderboard', data => {
         console.log(data)
