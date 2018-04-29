@@ -26,7 +26,9 @@ const curUsers = new Set()
 
 tw.on('data', data => {
   data = data.toString()
-  if (data == 'PING :tmi.twitch.tv\r\n') {
+  console.log(data)
+  if (data.indexOf('PING') != -1) {
+    console.log('ponged')
     return tw.write('PONG :tmi.twitch.tv\n')
   }
   let tokens = data.match(/^:(.*)!.* PRIVMSG .* :'(.)'\r\n$/)
